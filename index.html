@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>數位跟讀練習</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3/dist/index.js"></script>
+<style>
+:root{
+  --bg:#f7f3ea; --card:#fffdf8; --ink:#2b2a27; --muted:#7b766b; --line:#e4ddcc;
+  --accent:#c2541f; --accent-soft:#f6e3d6; --ok:#2f7d4f; --ok-soft:#dcefe2;
+  --bad:#c0392b; --bad-soft:#f8dcd8; --now:#f3c64d; --pend:#b9b3a5;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1c1b19; --card:#262522; --ink:#ece7dc; --muted:#a09a8d; --line:#3a3833;
+  --accent:#ec8a55; --accent-soft:#3d2a1f; --ok:#6cc68f; --ok-soft:#1f3527;
+  --bad:#f08070; --bad-soft:#3d2320; --now:#a9861f; --pend:#6c675e;
+}}
+:root[data-theme="dark"]{
+  --bg:#1c1b19; --card:#262522; --ink:#ece7dc; --muted:#a09a8d; --line:#3a3833;
+  --accent:#ec8a55; --accent-soft:#3d2a1f; --ok:#6cc68f; --ok-soft:#1f3527;
+  --bad:#f08070; --bad-soft:#3d2320; --now:#a9861f; --pend:#6c675e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;line-height:1.5}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 16px}
+.wrap{max-width:920px;margin:0 auto}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1{font-family:"Noto Serif TC",serif;font-size:1.35rem;margin:0}
+h1 small{font-family:"Noto Sans TC";font-weight:400;color:var(--muted);font-size:.8rem;margin-left:6px}
+select,button,input{font:inherit;color:inherit}
+select{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px;margin-top:10px;width:fit-content;max-width:100%;overflow-x:auto}
+.tabs button{border:0;background:none;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--accent);color:#fff}
+.opts{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;font-size:.9rem;color:var(--muted)}
+.opts label{display:flex;align-items:center;gap:6px}
+.opts input[type=range]{width:90px;accent-color:var(--accent)}
+.opts input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 16px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.status{font-size:.9rem;color:var(--muted);flex:1;min-width:160px}
+.status b{color:var(--accent)}
+.notice{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:.9rem;display:none}
+main{padding:16px}
+.hint{color:var(--muted);font-size:.88rem;margin:4px 0 14px}
+.line{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .2s, box-shadow .2s}
+.line.cur{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.line.mine .sp{background:var(--accent);color:#fff}
+.sp{flex:none;font-size:.78rem;border-radius:6px;padding:2px 8px;margin-top:6px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.body{flex:1;min-width:0}
+.txt{font-family:"Noto Serif TC",serif;font-size:1.45rem;line-height:1.9;display:flex;flex-wrap:wrap;row-gap:2px}
+.ch{display:inline-flex;flex-direction:column;align-items:center;border-radius:4px;transition:background .15s,color .15s;padding:0 1px}
+.ch i{font-style:normal;font-family:"Noto Sans TC";font-size:.62rem;line-height:1.1;color:var(--muted);min-height:0}
+.py-off .ch i{display:none}
+.ch.say{background:var(--now);color:#1c1b19}
+.ch.ok{color:var(--ok)}
+.ch.miss{color:var(--bad);background:var(--bad-soft)}
+.ch.pend{color:var(--pend)}
+.txt.hide .ch:not(.ok):not(.miss){filter:blur(7px)}
+.heard{font-size:.85rem;color:var(--muted);margin-top:4px;min-height:1.2em}
+.heard .live{color:var(--accent)}
+.acts{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ic{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--bg);cursor:pointer;display:grid;place-items:center;font-size:1rem}
+.acts.teach{flex-direction:row;flex-wrap:wrap;justify-content:flex-end;max-width:130px}
+.ic:disabled{opacity:.35;cursor:default}
+.ic.rec{background:var(--bad);border-color:var(--bad);color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px var(--bad-soft)}}
+.score{font-size:.8rem;font-weight:700;border-radius:999px;padding:1px 8px;min-width:44px;text-align:center}
+.score.good{background:var(--ok-soft);color:var(--ok)}
+.score.rec{background:var(--accent-soft);color:var(--accent)}
+.score.low{background:var(--bad-soft);color:var(--bad)}
+.note{color:var(--muted);font-size:.88rem;text-align:center;margin:6px 0 12px}
+.para{margin-top:18px}
+footer{max-width:920px;margin:0 auto;padding:8px 16px 40px;color:var(--muted);font-size:.8rem}
+@media (max-width:600px){ .txt{font-size:1.2rem} .line{padding:10px;gap:8px} .sp{display:none} .line.mine{border-left:4px solid var(--accent)} }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top">
+    <h1>數位跟讀練習<small>來學華語 第四冊</small></h1>
+    <select id="lesson" aria-label="選擇課次"></select>
+  </div>
+  <div class="tabs" id="tabs">
+    <button data-m="listen">① 聆聽</button>
+    <button data-m="shadow">② 跟讀</button>
+    <button data-m="role">③ 角色扮演</button>
+    <button data-m="teach">④ 老師錄音</button>
+  </div>
+  <div class="opts">
+    <label>語速 <input type="range" id="rate" min="0.5" max="1.3" step="0.05"><span id="rateV"></span></label>
+    <label>語音 <select id="voice"></select></label>
+    <label><input type="checkbox" id="py"> 拼音</label>
+    <label id="ownL"><input type="checkbox" id="own"> 用老師錄音</label>
+    <label id="syncL"><input type="checkbox" id="sync"> 邊聽邊讀（請戴耳機）</label>
+    <label id="roleL">我的角色 <select id="role"></select></label>
+    <label id="hideL"><input type="checkbox" id="hide"> 遮住我的台詞</label>
+  </div>
+  <div class="bar">
+    <button class="btn primary" id="go">▶ 開始</button>
+    <button class="btn" id="stop" disabled>■ 停止</button>
+    <button class="btn" id="reset">清除成績</button>
+    <button class="btn" id="export">⬇ 匯出含錄音版</button>
+    <input type="file" id="upload" accept="audio/*" hidden>
+    <div class="status" id="status"></div>
+  </div>
+</div></header>
+<main class="wrap">
+  <div class="notice" id="notice"></div>
+  <p class="hint" id="hint"></p>
+  <div id="list"></div>
+</main>
+<footer>語音合成與辨識使用瀏覽器內建功能（建議 Chrome / Edge），不需 API 金鑰。老師錄音只存在這台電腦的瀏覽器裡，要給學生請用「匯出含錄音版」。辨識以「字」比對，同音字視為正確；無法判斷聲調。</footer>
+
+<script>
+const SRC = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+const REC = /*REC*/{}/*END*/;
+const L = [{"no": "第一課", "title": "我要到臺灣去", "lines": [{"sp": "高莉亞", "text": "是啊！我告訴你一個好消息，我們公司要派我到臺灣工作。"}, {"sp": "王明文", "text": "哇！恭喜妳。妳終於有機會去臺灣看看了。"}, {"sp": "高莉亞", "text": "雖然去臺灣讓我很高興，但是有點緊張，不知道我能不能適應那裡的工作跟生活。"}, {"sp": "王明文", "text": "放心，妳一定很快就適應了。我請我弟弟家文去機場接妳吧。"}, {"sp": "高莉亞", "text": "好啊！這樣我就不擔心會迷路了。"}, {"sp": "王明文", "text": "你們公司打算派妳去多久？"}, {"sp": "高莉亞", "text": "半年。不過，公司說如果有需要的話，希望我多留半年。"}, {"sp": "王明文", "text": "妳到臺灣以後，除了工作，還有什麼計畫？"}, {"sp": "高莉亞", "text": "我最想試試看臺灣特別的小吃，也想把有名的地方都看看。"}, {"sp": "王明文", "text": "那麼，我給妳介紹一位臺灣同事，她的個性跟妳很像，很活潑也很熱心，一定願意帶妳到處去玩玩。"}, {"sp": "高莉亞", "text": "太好了！如果公司同意的話，我還想去學中文。"}, {"sp": "王明文", "text": "我請家文幫妳打聽一下，應該可以找到適合妳的學校和中文課。"}, {"sp": "高莉亞", "text": "謝謝你替我安排這些事，你真是我的好朋友。"}, {"sp": "王明文", "text": "不客氣，朋友應該互相幫忙。我希望妳對臺灣留下美好的印象。"}]}, {"no": "第二課", "title": "歡迎你來臺灣", "lines": [{"sp": "王家文", "text": "高莉亞，妳好。歡迎妳來臺灣！"}, {"sp": "高莉亞", "text": "家文，謝謝你來機場接我。讓你等這麼久，真不好意思。"}, {"sp": "王家文", "text": "沒關係。妳所有的行李都在這裡吧，推車看起來有點重，我來推吧！"}, {"sp": "高莉亞", "text": "謝謝，麻煩你了。坐了十幾個小時的飛機，還有時差，我累得不得了。"}, {"sp": "王家文", "text": "妳餓不餓？要不要先吃點東西再去臺北？"}, {"sp": "高莉亞", "text": "我在飛機上吃得很飽，現在一點都不餓，只是有點渴，我想買瓶水。不過我沒有臺幣，得先在機場換一點錢。"}, {"sp": "王家文", "text": "機場換錢很方便，從這裡往前走，然後右轉就看到銀行了。"}, {"note": "王家文帶高莉亞去換好了錢"}, {"sp": "王家文", "text": "請妳在這個地方等一下，我去把車開過來。"}, {"sp": "高莉亞", "text": "從桃園機場到臺北遠不遠？"}, {"sp": "王家文", "text": "不遠。桃園也在臺灣的北部，如果不塞車的話，開車一個小時左右就到了。除了開車，還可以搭機場捷運或是巴士到機場。"}]}, {"no": "第三課", "title": "我租的公寓不錯", "lines": [{"sp": "王家文", "text": "莉亞，我是家文。妳搬好家了嗎？"}, {"sp": "高莉亞", "text": "已經搬好了。有公司同事幫忙，一切都沒問題。"}, {"sp": "王家文", "text": "妳租的房子怎麼樣？"}, {"sp": "高莉亞", "text": "雖然那棟大樓外面看起來有點舊，可是我租的公寓裡面整理得很乾淨，我覺得不錯。"}, {"sp": "王家文", "text": "妳住在幾樓？有幾個房間？"}, {"sp": "高莉亞", "text": "我住在六樓，有客廳和兩個房間，還有廚房跟浴室，我一個人住剛好。"}, {"sp": "王家文", "text": "六樓不錯，如果電梯壞了，走樓梯上去不太累，哈！哈！附近環境怎麼樣？"}, {"sp": "高莉亞", "text": "公寓在巷子裡面，很安靜。另外，買東西也很方便，走出巷子就到大馬路，從巷子口往左轉，再走幾步路，就有便利商店跟超市，我需要的東西都買得到。"}, {"sp": "王家文", "text": "聽起來不錯。房租貴不貴？"}, {"sp": "高莉亞", "text": "我覺得不算貴。家具都是新的，再加上電視、冰箱都有，每個月租金兩萬五千塊錢。"}, {"sp": "王家文", "text": "房租包括水費、電費嗎？房東幫妳裝好網路了嗎？"}, {"sp": "高莉亞", "text": "房租不包括水費、電費。房東已經把網路裝好了，但是網路費我得自己付。"}, {"sp": "王家文", "text": "附近交通方便嗎？"}, {"sp": "高莉亞", "text": "大馬路上有公車，離捷運站也不太遠，去上班很方便。"}, {"sp": "王家文", "text": "聽起來妳對住的地方很滿意。以後需要我幫忙的話，一定要跟我說，別客氣。"}, {"sp": "高莉亞", "text": "謝謝你的關心。等我把房子整理好了，再請你來我家坐坐。"}]}, {"no": "第四課", "title": "捷運又快又方便", "lines": [{"sp": "李國成", "text": "莉亞，這是幫妳帶回來的豆漿和蛋餅。妳晚餐只吃這些嗎？"}, {"sp": "高莉亞", "text": "我不太餓，這些夠了。你買了什麼？"}, {"sp": "李國成", "text": "雞腿便當，妳看，很豐富吧？"}, {"sp": "高莉亞", "text": "聞起來很香，改天我吃吃看。"}, {"sp": "李國成", "text": "聽說妳家離公司不遠，妳每天怎麼來上班？"}, {"sp": "高莉亞", "text": "我平常搭捷運。上班快遲到了，我才搭計程車。"}, {"sp": "李國成", "text": "妳搭哪一條路線？要轉車嗎？"}, {"sp": "高莉亞", "text": "我搭綠線，搭四站就到公司了，不必轉車。我非常喜歡臺灣的捷運，不但班次多，而且車票不算貴。"}, {"sp": "李國成", "text": "是啊！大家都認為捷運又快又方便。如果妳會騎自行車的話，也可以騎自行車來。"}, {"sp": "高莉亞", "text": "騎自行車？可是我沒有自行車啊！"}, {"sp": "李國成", "text": "妳在捷運站外面看到很多自行車吧？那是誰都可以租的，很受歡迎。"}, {"sp": "高莉亞", "text": "你說的是那些黃色的自行車？難怪很多人一出捷運站就去騎車，我還覺得很奇怪呢！"}, {"sp": "李國成", "text": "用悠遊卡就可以租，妳明天可以試試看。"}, {"sp": "高莉亞", "text": "這裡有很多汽車、摩托車，我覺得騎自行車有點危險。"}, {"sp": "李國成", "text": "只要妳慢慢地騎，注意旁邊的摩托車，就不會有問題。"}, {"sp": "高莉亞", "text": "捷運很方便，為什麼還有那麼多人騎摩托車？"}, {"sp": "李國成", "text": "摩托車更方便啊！想去哪裡就去哪裡，完全不必走路。在臺灣，摩托車是最普遍的交通工具。"}, {"sp": "高莉亞", "text": "這個情形跟大部分美國人出門常開車一樣，都是為了方便。"}]}, {"no": "第五課", "title": "夜市好熱鬧", "lines": [{"sp": "陳芳宜", "text": "莉亞，我是芳宜。明文請我帶妳去逛夜市，妳後天有空嗎？"}, {"sp": "高莉亞", "text": "好啊！我在美國就常聽明文提到夜市，早就想去逛逛了。"}, {"sp": "陳芳宜", "text": "那麼，後天下午五點，捷運中山站6號出口見，妳方便嗎？"}, {"sp": "高莉亞", "text": "可以，我會準時到的。"}, {"note": "高莉亞跟陳芳宜見面後去夜市，一邊走一邊看"}, {"sp": "陳芳宜", "text": "妳看，前面有很多商店和攤販的地方就是夜市。"}, {"sp": "高莉亞", "text": "哇！好多人，沒想到這麼熱鬧。"}, {"sp": "陳芳宜", "text": "對臺灣人來說，逛夜市算是一種休閒活動，大部分的人都喜歡。"}, {"sp": "高莉亞", "text": "夜市為什麼這麼吸引人？"}, {"sp": "陳芳宜", "text": "因為夜市有各式各樣的小吃、飲料、衣服跟日用品。來吃晚飯、吃消夜，或是買東西都很方便。再加上，價錢都不算貴，所以不管誰都喜歡。"}, {"sp": "高莉亞", "text": "哇！那個老闆賣的雞排好大，比我的臉還大，我要吃吃看。"}, {"sp": "陳芳宜", "text": "夜市的雞排炸得又酥又脆，算是最受歡迎的小吃。"}, {"sp": "高莉亞", "text": "咦！我聞到一個奇怪的味道，是什麼啊？"}, {"sp": "陳芳宜", "text": "是臭豆腐。臭豆腐聞起來臭臭的，吃起來一點也不臭，妳敢不敢嚐嚐看？"}, {"sp": "高莉亞", "text": "臭豆腐這麼有名，我當然要試試。嗯，吃起來酥酥的，味道還不錯，沒有聞起來那麼臭，難怪臺灣人喜歡。"}, {"sp": "陳芳宜", "text": "那個攤販賣木瓜牛奶，它跟珍珠奶茶一樣，也是很多人喜歡的，要不要喝喝看？"}, {"sp": "高莉亞", "text": "我太愛珍珠奶茶了，幾乎每天都喝一杯，今天我喝木瓜牛奶吧。"}, {"sp": "陳芳宜", "text": "夜市一個晚上是逛不完的，妳以後想什麼時候來就什麼時候來，再慢慢地逛。"}]}, {"no": "第六課", "title": "臺北的特色", "lines": [{"sp": "", "text": "高莉亞已經在臺北住了四個多月了，不管生活、工作都算是適應了。", "para": true}, {"sp": "", "text": "雖然高莉亞早就知道臺灣跟美國不一樣，但是她沒想到臺北還有很多特別的情形。", "para": false}, {"sp": "", "text": "首先，在臺北會看到不同的建築，有中式的、日式的或是西式的，高莉亞聽說這跟臺灣的歷史有關係。", "para": true}, {"sp": "", "text": "除了傳統的建築，也有現代的，最有名的就是臺北101大樓。", "para": false}, {"sp": "", "text": "觀光客幾乎都會到最高一層樓去看看風景。", "para": false}, {"sp": "", "text": "晚上，從往往下看，五顏六色的燈光讓臺北變得更美了。", "para": false}, {"sp": "", "text": "臺北還有很多值得去參觀的地方，像博物館跟寺廟。", "para": false}, {"sp": "", "text": "在博物館，可以看到很多古物。", "para": false}, {"sp": "", "text": "在寺廟，能欣賞傳統建築的特色，也能了解華人的宗教信仰。", "para": false}, {"sp": "", "text": "除了各式各樣的建築，還有一個讓高莉亞覺得非常有趣的現象，就是到處可以看到餐廳跟飲料店。", "para": true}, {"sp": "", "text": "而且總是有人在門口排隊，等著進去吃飯、等著外帶飲料。", "para": false}, {"sp": "", "text": "這個情形讓高莉亞覺得，「吃美食」對臺灣人來說，是非常重要的一件事。", "para": false}, {"sp": "", "text": "高莉亞還發現，跟很多大城市比起來，臺北是一個很安全的城市。", "para": true}, {"sp": "", "text": "她晚上可以去逛夜市，可以跟同事去喝酒，玩到半夜才回家都沒問題。", "para": false}, {"sp": "", "text": "臺北路上車很多，交通有點亂，但是臺灣人很友善，生活也很方便，高莉亞認為臺北是一個適合居住的城市。", "para": false}]}, {"no": "第七課", "title": "臺灣人喜歡的休閒活動", "lines": [{"sp": "陳芳宜", "text": "莉亞，我是芳宜。這個週末妳想不想去看棒球比賽？"}, {"sp": "高莉亞", "text": "我從來沒看過，沒想到妳喜歡看棒球比賽。"}, {"sp": "陳芳宜", "text": "我本來不愛看，因為我男朋友是棒球迷，只要有比賽就會約去看，後來我就慢慢地喜歡看了。"}, {"sp": "高莉亞", "text": "我跟何希也常常去看運動比賽。我喜歡看網球比賽，他喜歡看美式足球比賽。"}, {"sp": "陳芳宜", "text": "我知道世界上最多人喜歡的運動是足球，但是在臺灣，棒球和籃球是比較受歡迎的運動。"}, {"sp": "高莉亞", "text": "我前幾天經過一個運動場，聽見裡面有很多人大聲地喊著加油，是不是棒球比賽？"}, {"sp": "陳芳宜", "text": "應該是吧。看比賽的時候，又喊又叫，很過癮。不管自己喜歡的球隊贏了或是輸了，看球賽都是很有意思的休閒活動。"}, {"sp": "高莉亞", "text": "我們也是。除了看球賽，週末晚上我們還喜歡跟朋友去酒吧喝酒，一邊喝酒，一邊聊天，會暫時忘記工作的壓力。"}, {"sp": "陳芳宜", "text": "在臺灣去酒吧喝酒不是那麼普遍，喜歡去KTV唱歌的人比較多。"}, {"sp": "高莉亞", "text": "我常聽見同事提到去唱歌，臺灣人怎麼這麼愛唱歌啊？"}, {"sp": "陳芳宜", "text": "在KTV唱唱自己喜歡的流行歌曲，會讓人心情變得很輕鬆。另外，如果有人唱得非常好聽，聽他們唱歌也是一種享受。"}, {"sp": "高莉亞", "text": "我不會唱中文歌，不能跟你們一起去，好可惜啊！"}, {"sp": "陳芳宜", "text": "KTV裡面也有外國歌，英文的、日文的都有。"}, {"sp": "高莉亞", "text": "真的？太好了。改天我要去KTV看看。"}]}, {"no": "第八課", "title": "參加結婚典禮", "lines": [{"sp": "高莉亞", "text": "國成，我收到黃小姐的喜帖，她請我參加她的結婚典禮。"}, {"sp": "李國成", "text": "我也收到了。妳會去喝喜酒吧？"}, {"sp": "高莉亞", "text": "我從來沒參加過華人的婚禮，當然會去。我應該送禮物還是送紅包呢？"}, {"sp": "李國成", "text": "送禮物可以，不過大部分的人會送紅包。"}, {"sp": "高莉亞", "text": "那麼我也送紅包吧。我聽說送紅包要注意數字，是吧？"}, {"sp": "李國成", "text": "是，一定要包雙數，而且不可以有「四」這個數字。"}, {"sp": "高莉亞", "text": "我早就知道了，在臺灣，「四」不是幸運的數字。臺灣人結婚的時候還有哪些習俗呢？"}, {"sp": "李國成", "text": "從古代起，結婚的習俗就非常複雜，改天我再詳細地給妳介紹。"}, {"sp": "高莉亞", "text": "我經過一家店，看到很多結婚照片，大部分穿著西式禮服，臺灣人現在不喜歡傳統方式了嗎？"}, {"sp": "李國成", "text": "有些家庭還是重視傳統的，但是時代不同了，這些傳統習俗也變得越來越簡單。尤其是年輕人，不太在乎傳統習俗了。"}, {"note": "在結婚典禮上"}, {"sp": "高莉亞", "text": "妳看，黃小姐穿上新娘禮服好漂亮，新郎也很帥。連同事們都穿得跟平常不太一樣，我幾乎認不出來是誰了。"}, {"sp": "李國成", "text": "參加婚禮不可以太隨便，我們都會打扮得正式一點。"}, {"sp": "高莉亞", "text": "沒想到臺灣的婚禮這麼熱鬧，為什麼雙方的父母跟新郎新娘要來敬酒？"}, {"sp": "李國成", "text": "敬酒是主人對大家表示感謝，客人也可以在這個時候祝福他們。"}, {"sp": "高莉亞", "text": "我們就一起祝福他們「百年好合、早生貴子」吧！"}]}, {"no": "第九課", "title": "臺灣的原住民", "lines": [{"sp": "陳芳宜", "text": "莉亞，中秋節快到了，放三天假，妳打算做什麼呢？"}, {"sp": "高莉亞", "text": "我要去東部旅行，因為我對臺灣原住民的文化非常有興趣。"}, {"sp": "陳芳宜", "text": "臺灣東部很值得去看看，不但可以看到原住民的文化，還可以欣賞美麗的太平洋海岸。"}, {"sp": "高莉亞", "text": "聽說臺灣原住民有很多族群，一共有多少個呢？"}, {"sp": "陳芳宜", "text": "原住民一共有十六個族群，他們住在臺灣各地。"}, {"sp": "高莉亞", "text": "各族群的文化有很大的差別嗎？"}, {"sp": "陳芳宜", "text": "不同的族群，在語言、文化、風俗習慣上，各有各的特色。最大的族群是阿美族，大部分住在花蓮和臺東。"}, {"sp": "高莉亞", "text": "那麼我去東部旅行的選擇是正確的。下次我應該去哪裡？"}, {"sp": "陳芳宜", "text": "我建議妳去屏東的「臺灣原住民族文化園區」，那裡有原住民的傳統文化和生活方式的展覽，另外還有手工藝教學活動。"}, {"sp": "高莉亞", "text": "太好了！我可以順便學一點原住民的手工藝，去了一定很有收穫。"}, {"sp": "陳芳宜", "text": "妳也可以安排一趟環島旅行。臺灣有名的景點，像阿里山、日月潭、墾丁等，都有不同的原住民部落，而且也有不同的祭典活動。"}, {"sp": "高莉亞", "text": "我看過一個小島原住民的祭典影片，他們的祭典跟魚有關。"}, {"sp": "陳芳宜", "text": "那是蘭嶼，在臺灣東邊。那裡的原住民習俗常跟海洋有關，他們做的船也非常漂亮。"}, {"sp": "高莉亞", "text": "他們的音樂和舞蹈，都很特別，我非去看看不可！"}, {"sp": "陳芳宜", "text": "是啊！妳也可以跟著學學。"}]}, {"no": "第十課", "title": "我的臺灣經驗", "lines": [{"sp": "", "text": "時間過得很快，一轉眼我在臺北住了快一年了。", "para": true}, {"sp": "", "text": "這一年，我不但感受到臺灣人的友善和熱情，也有很大的收穫。", "para": false}, {"sp": "", "text": "來臺灣以前，我有點擔心，怕不能適應亞洲的環境，沒想到一切都很順利。", "para": true}, {"sp": "", "text": "在生活上沒問題的原因是臺北很現代化，也很國際化。", "para": false}, {"sp": "", "text": "這裡有二十四小時營業的便利商店，有賣各種小吃和日用品的夜市，還有賣各國食物的餐廳，讓我吃東西、買東西都很容易。", "para": false}, {"sp": "", "text": "另外，我對臺北印象最深刻的就是又乾淨又便宜的捷運，不管去哪裡都很方便。", "para": false}, {"sp": "", "text": "除了工作，我總是利用週末或假期去嘗試不同的事情，得到了許多我人生中的第一次經驗。", "para": true}, {"sp": "", "text": "比方說去逛夜市吃了臭豆腐；去KTV唱了中文歌；去看原住民部落文化，學了舞蹈跟手工藝；去參加婚禮，還包了紅包。", "para": false}, {"sp": "", "text": "這些難得的經驗給我的人生帶來許多美好的回憶。", "para": false}, {"sp": "", "text": "旅行時，我買了許多紀念品，打算帶回去送給朋友。", "para": false}, {"sp": "", "text": "當然我也要帶道地的臺灣茶和鳳梨酥回去讓何希嚐嚐。", "para": false}, {"sp": "", "text": "要帶這麼多東西回去，我原來的行李箱一定裝不下，恐怕得再買一個了。", "para": false}, {"sp": "", "text": "我剛開始學中文時聽過一句話，「想把語言學好，最好到那個語言環境裡住一段時間。」", "para": true}, {"sp": "", "text": "來臺灣以後，我發現這句話非常有道理。", "para": false}, {"sp": "", "text": "一般來說，我天天都能聽到中文，有機會跟別人說中文，所以我的中文，不管聽力或是說話，都進步得非常快，這是我當初沒想到的，算是一個意外的收穫吧。", "para": false}]}];
+
+/* ---------- settings ---------- */
+const S = { lesson:0, mode:'listen', rate:0.9, py:false, sync:false, hide:false, role:'', voice:'', start:0, own:true };
+try{ Object.assign(S, JSON.parse(localStorage.getItem('gd-settings')||'{}')); }catch(e){}
+function save(){ try{ localStorage.setItem('gd-settings', JSON.stringify(S)); }catch(e){} }
+const $ = id => document.getElementById(id);
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const synth = window.speechSynthesis;
+const hasPy = () => typeof pinyinPro !== 'undefined';
+const isZh = c => /[㐀-鿿]/.test(c);
+const isKey = c => /[㐀-鿿A-Za-z0-9]/.test(c);
+
+/* ---------- pinyin helpers ---------- */
+function pyArr(text, toneType){
+  const zh = [...text].filter(isZh);
+  if(!hasPy() || !zh.length) return zh.map(()=> '');
+  let a = pinyinPro.pinyin(zh.join(''), {type:'array', toneType});
+  if(a.length !== zh.length) a = zh.map(c => pinyinPro.pinyin(c, {toneType}));
+  return a;
+}
+const DIG = '零一二三四五六七八九';
+function numZh(s){
+  let n = parseInt(s,10);
+  if(s.length>1 && s[0]==='0' || n>=100000) return [...s].map(d=>DIG[d]).join('');
+  if(n<10) return DIG[n];
+  const u=['','十','百','千','萬']; let out='', zero=false, ds=String(n).split('').map(Number), len=ds.length;
+  ds.forEach((d,i)=>{ const p=len-1-i; if(d===0){ zero=true; return; } if(zero&&out){ out+='零'; } zero=false; out += (d===1&&p===1&&i===0?'':DIG[d]) + u[p]; });
+  return out;
+}
+const VAR={'妳':'你','臺':'台','兩':'二','裏':'裡','她':'他','牠':'他','它':'他'};
+function norm(o){ const v=VAR[o.ch]; return v ? {ch:v, py: hasPy()?pinyinPro.pinyin(v,{toneType:'none'}):v} : o; }
+function keysOf(text){ // comparable units
+  const chars = [...text.replace(/\d+/g, numZh).toUpperCase()].filter(isKey);
+  const py = pyArr(chars.join(''), 'none'); let k=0;
+  return chars.map(ch => norm({ch, py: isZh(ch) ? py[k++] : ch}));
+}
+
+/* ---------- data prep ---------- */
+function prepLesson(les){
+  les.lines.forEach(ln=>{
+    if(ln.note || ln.keys) return;
+    const chars=[...ln.text], tone=pyArr(ln.text,'symbol'), none=pyArr(ln.text,'none');
+    let k=0; ln.chars=[]; ln.keys=[];
+    chars.forEach((c,idx)=>{
+      const o={c, idx, tone:'', key:null};
+      if(isZh(c)){ o.tone=tone[k]; o.key=norm({ch:c, py:none[k]}); k++; }
+      else if(/\d/.test(c)){ const z=DIG[c]; o.key={ch:z, py: hasPy()?pinyinPro.pinyin(z,{toneType:'none'}):z}; }
+      else if(/[A-Za-z]/.test(c)){ o.key={ch:c.toUpperCase(), py:c.toUpperCase()}; }
+      if(o.key){ o.k=ln.keys.length; ln.keys.push(o); }
+      ln.chars.push(o);
+    });
+  });
+}
+function speakers(les){ return [...new Set(les.lines.filter(l=>l.sp).map(l=>l.sp))]; }
+
+/* ---------- render ---------- */
+const scores = {}; // `${lesson}-${i}` -> %
+function render(){
+  const les=L[S.lesson]; prepLesson(les);
+  const sps=speakers(les);
+  $('role').innerHTML = sps.map(s=>`<option ${s===S.role?'selected':''}>${s}</option>`).join('');
+  if(!sps.includes(S.role)) S.role = sps[0]||'';
+  const list=$('list'); list.innerHTML=''; list.className = S.py ? '' : 'py-off';
+  les.lines.forEach((ln,i)=>{
+    if(ln.note){ const n=document.createElement('div'); n.className='note'; n.textContent='（'+ln.note+'）'; list.appendChild(n); return; }
+    const row=document.createElement('div'); row.className='line'+(ln.para&&i>0?' para':''); row.dataset.i=i;
+    if(S.mode==='role' && ln.sp===S.role) row.classList.add('mine');
+    row.innerHTML = (ln.sp?`<span class="sp">${ln.sp}</span>`:'') +
+      `<div class="body"><div class="txt${S.mode==='role'&&S.hide&&ln.sp===S.role?' hide':''}">${
+        ln.chars.map(o=>`<span class="ch"><i>${o.tone||'&nbsp;'}</i>${o.c}</span>`).join('')
+      }</div><div class="heard"></div></div>
+      ${S.mode==='teach'
+        ? `<div class="acts teach"><button class="ic" data-a="rec" title="錄這一句">⏺</button><button class="ic" data-a="play" title="播放">▶</button><button class="ic" data-a="up" title="上傳音檔">📁</button><button class="ic" data-a="del" title="刪除錄音">🗑</button><span class="score"></span></div>`
+        : `<div class="acts"><button class="ic" data-a="play" title="播放">▶</button><button class="ic" data-a="mic" title="我來讀" ${SR?'':'disabled'}>🎤</button><span class="score"></span></div>`}`;
+    ln.row=row; ln.spans=[...row.querySelectorAll('.ch')];
+    list.appendChild(row);
+    if(S.mode==='teach') showRecBadge(i);
+    else { const sc=scores[S.lesson+'-'+i]; if(sc!=null) showScore(i,sc); }
+  });
+  const anyRec=Object.keys({...REC,...AUD}).some(k=>audioFor(k));
+  $('ownL').style.display = anyRec ? '' : 'none';
+  $('export').style.display = S.mode==='teach' ? '' : 'none';
+  $('reset').style.display = S.mode==='teach' ? 'none' : '';
+  $('go').textContent = S.mode==='teach' ? '⏺ 連續錄音' : '▶ 開始';
+  setCur(Math.min(S.start, les.lines.length-1));
+  $('syncL').style.display = S.mode==='shadow' ? '' : 'none';
+  $('roleL').style.display = $('hideL').style.display = S.mode==='role' ? '' : 'none';
+  $('hint').textContent = {
+    listen:'點任一句可單句播放；按「開始」從選取的句子連續播放，文字會跟著聲音亮起來。',
+    shadow:'每句先聽老師讀，聽到「嗶」聲後跟著讀。邊講邊看字變綠色；紅色是漏掉或讀錯的字。沒達到 70% 會自動再練一次。',
+    teach:'按「連續錄音」：聽到嗶聲就讀目前這句，讀完停 1.5 秒會自動存檔並跳到下一句（也可以按空白鍵馬上換句，Esc 停止）。也可以單句重錄、上傳現成音檔。',
+    role: sps.length ? '選好角色後按「開始」：電腦讀其他人的台詞，輪到你（橘色）時聽到「嗶」聲就開口。' : '本課是短文，沒有角色。請改用「跟讀」模式。'
+  }[S.mode];
+  updateStatus();
+}
+function setCur(i){
+  const les=L[S.lesson]; S.start=i; save();
+  les.lines.forEach(l=>l.row&&l.row.classList.remove('cur'));
+  const ln=les.lines[i]; if(ln&&ln.row){ ln.row.classList.add('cur'); }
+}
+function scrollTo(i){ const r=L[S.lesson].lines[i].row; if(r) r.scrollIntoView({block:'center',behavior:'smooth'}); }
+function showScore(i,sc){
+  const el=L[S.lesson].lines[i].row.querySelector('.score');
+  el.textContent=sc+'%'; el.className='score '+(sc>=70?'good':'low');
+}
+function updateStatus(msg){
+  const les=L[S.lesson], ids=les.lines.map((l,i)=>i).filter(i=>!les.lines[i].note);
+  if(S.mode==='teach'){ const n=ids.filter(i=>audioFor(S.lesson+'-'+i)).length;
+    $('status').innerHTML=(msg?msg+'　':'')+`本課已錄 <b>${n}/${ids.length}</b> 句`; return; }
+  const done=ids.filter(i=>scores[S.lesson+'-'+i]!=null);
+  const avg=done.length?Math.round(done.reduce((a,i)=>a+scores[S.lesson+'-'+i],0)/done.length):null;
+  $('status').innerHTML = (msg?msg+'　':'') + (done.length?`已練 ${done.length}/${ids.length} 句，平均 <b>${avg}%</b>`:'');
+}
+function clearMarks(ln){ ln.spans.forEach(s=>s.classList.remove('say','ok','miss','pend')); }
+
+/* ---------- speech synthesis ---------- */
+let voices=[];
+function loadVoices(){
+  voices = synth ? synth.getVoices().filter(v=>/^zh|cmn/i.test(v.lang)) : [];
+  const rank=v=>(/TW/i.test(v.lang)?0:/CN|Hans/i.test(v.lang)?2:4)
+    + (/Mei-?Jia|美佳|國語|Hsiao|Yating|Hanhan|Google/i.test(v.name)?-1:0)
+    + (/Eddy|Flo|Grand|Reed|Rocko|Sandy|Shelley/i.test(v.name)?1:0);
+  voices.sort((a,b)=>rank(a)-rank(b));
+  $('voice').innerHTML = voices.map(v=>`<option value="${v.name}" ${v.name===S.voice?'selected':''}>${v.name.replace(/\(.*?\)/g,'').trim()}（${v.lang}）</option>`).join('') || '<option>（找不到中文語音）</option>';
+  if(!voices.find(v=>v.name===S.voice) && voices[0]) S.voice=voices[0].name;
+}
+if(synth){ loadVoices(); synth.onvoiceschanged = loadVoices; }
+
+function speakLine(i, tok){
+  const les=L[S.lesson], ln=les.lines[i];
+  if(S.own && audioFor(S.lesson+'-'+i)) return playOwn(i, tok);
+  return new Promise(res=>{
+    if(!synth){ res(); return; }
+    synth.cancel(); clearMarks(ln);
+    const u=new SpeechSynthesisUtterance(ln.text);
+    const v=voices.find(v=>v.name===S.voice); if(v){ u.voice=v; u.lang=v.lang; } else u.lang='zh-TW';
+    u.rate=S.rate;
+    const sps=speakers(les); u.pitch = ln.sp ? [1,0.82,1.15,0.95][sps.indexOf(ln.sp)%4] : 1;
+    let pos=-1, gotBoundary=false, timer=null, done=false;
+    const mark=n=>{ for(let k=pos+1;k<=n&&k<ln.spans.length;k++) ln.spans[k].classList.add('say'); pos=Math.max(pos,n); };
+    const finish=()=>{ if(done) return; done=true; clearInterval(timer); clearTimeout(safety); setTimeout(()=>ln.spans.forEach(s=>s.classList.remove('say')),250); res(); };
+    u.onboundary=e=>{ if(tok!==run) return; gotBoundary=true; clearInterval(timer); mark(e.charIndex + Math.max(1,e.charLength||1) - 1); };
+    u.onstart=()=>{ const t0=Date.now(), cps=4.3*S.rate;
+      timer=setInterval(()=>{ if(!gotBoundary) mark(Math.floor((Date.now()-t0)/1000*cps)); },80); };
+    u.onend=()=>{ mark(ln.spans.length-1); finish(); };
+    u.onerror=finish;
+    const safety=setTimeout(finish, 3000 + ln.text.length*600/S.rate);
+    synth.speak(u);
+  });
+}
+
+/* ---------- teacher recordings ---------- */
+const AUD={}; const urlCache={}; let player=null, recCtl=null, micStream=null;
+const PFX='b4-';
+function idb(){ return new Promise((res,rej)=>{ const q=indexedDB.open('gd-audio',1);
+  q.onupgradeneeded=()=>q.result.createObjectStore('rec'); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
+async function loadAudio(){ try{ const db=await idb(); await new Promise(r=>{ const c=db.transaction('rec').objectStore('rec').openCursor();
+  c.onsuccess=()=>{ const cur=c.result; if(!cur) return r(); if(String(cur.key).startsWith(PFX)) AUD[String(cur.key).slice(PFX.length)]=cur.value; cur.continue(); };
+  c.onerror=()=>r(); }); }catch(e){} }
+async function putAudio(k,v){ AUD[k]=v; delete urlCache[k];
+  try{ const db=await idb(); db.transaction('rec','readwrite').objectStore('rec').put(v, PFX+k); }catch(e){ showNotice('錄音無法儲存在這個瀏覽器（可能是無痕模式）。'); } }
+async function delAudio(k){ await putAudio(k, {del:true}); }
+function audioFor(k){ const a=AUD[k]; if(a) return a.del?null:a; return REC[k]||null; }
+function urlOf(k){ const a=audioFor(k); if(!a) return null; if(a.src) return a.src;
+  return urlCache[k] || (urlCache[k]=URL.createObjectURL(a.blob)); }
+function showRecBadge(i){ const el=L[S.lesson].lines[i].row.querySelector('.score'); const has=audioFor(S.lesson+'-'+i);
+  el.textContent=has?'已錄':''; el.className='score'+(has?' rec':''); }
+
+function playOwn(i,tok){
+  const ln=L[S.lesson].lines[i], k=S.lesson+'-'+i, a=audioFor(k);
+  return new Promise(res=>{
+    clearMarks(ln);
+    const au=new Audio(urlOf(k)); player=au; au.playbackRate=S.rate; au.preservesPitch=true;
+    let timer=null, done=false, t0=null;
+    const finish=()=>{ if(done) return; done=true; clearInterval(timer); au.pause(); if(player===au) player=null;
+      setTimeout(()=>ln.spans.forEach(s=>s.classList.remove('say')),250); res(); };
+    const mark=frac=>{ const n=Math.min(ln.keys.length, Math.ceil(frac*ln.keys.length));
+      const upto = n>=ln.keys.length ? ln.spans.length-1 : (n>0 ? ln.keys[n-1].idx : -1);
+      for(let s=0;s<=upto;s++) ln.spans[s].classList.add('say'); };
+    au.onplaying=()=>{ if(t0==null) t0=Date.now();
+      timer=setInterval(()=>{ if(tok!==run) return finish();
+        const t=au.currentTime, s=a.s||0;
+        let e=a.e; if(e==null) e=isFinite(au.duration)?au.duration:(s+ln.keys.length/4.3);
+        mark(Math.max(0,(t-s)/(e-s)));
+        if(a.e!=null && t>=a.e+0.15) { mark(1); finish(); }
+      },60); };
+    au.onended=()=>{ mark(1); finish(); }; au.onerror=finish;
+    au.play().catch(finish);
+  });
+}
+
+async function recordLine(i,tok){
+  const ln=L[S.lesson].lines[i], btn=ln.row.querySelector('[data-a=rec]');
+  try{ micStream = micStream || await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}}); }
+  catch(e){ showNotice('無法使用麥克風：請在網址列左邊允許麥克風後再試。'); return false; }
+  if(tok!==run) return false;
+  setCur(i); scrollTo(i); clearMarks(ln);
+  updateStatus('準備錄第 '+(i+1)+' 句…'); await beep(); if(tok!==run) return false;
+  actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+  const src=actx.createMediaStreamSource(micStream), an=actx.createAnalyser(); an.fftSize=1024; src.connect(an);
+  const buf=new Float32Array(an.fftSize);
+  const mr=new MediaRecorder(micStream), chunks=[]; mr.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  return new Promise(res=>{
+    let s=null, e=null, noise=[], thr=0.02, aborted=false; const t0=performance.now();
+    const stop=()=>{ clearInterval(vad); try{src.disconnect();}catch(_){} if(mr.state!=='inactive') mr.stop(); };
+    recCtl={ finish:stop, abort:()=>{ aborted=true; stop(); } };
+    const vad=setInterval(()=>{
+      an.getFloatTimeDomainData(buf); let sum=0; for(const v of buf) sum+=v*v; const rms=Math.sqrt(sum/buf.length);
+      const t=(performance.now()-t0)/1000;
+      if(t<0.25){ noise.push(rms); thr=Math.max(0.015, 2.5*noise.reduce((a,b)=>a+b,0)/noise.length); return; }
+      if(rms>thr){ if(s==null) s=t; e=t; }
+      if(s!=null && t-e>1.5) stop(); else if(s==null && t>8) stop(); else if(t>40) stop();
+    },50);
+    mr.onstop=async ()=>{ recCtl=null; btn&&btn.classList.remove('rec');
+      if(aborted || tok!==run){ res(false); return; }
+      if(s==null){ updateStatus('沒有錄到聲音，已停止'); res(false); return; }
+      const blob=new Blob(chunks,{type:mr.mimeType||'audio/webm'});
+      await putAudio(S.lesson+'-'+i,{blob, s:Math.max(0,s-0.2), e:e+0.15});
+      showRecBadge(i); updateStatus('第 '+(i+1)+' 句已存'); res(true);
+    };
+    mr.start(); btn&&btn.classList.add('rec'); updateStatus('<b>● 錄音中</b>：請讀第 '+(i+1)+' 句');
+  });
+}
+
+function blobToData(b){ return new Promise(r=>{ const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); }); }
+async function exportHtml(){
+  const out={};
+  const keys=new Set([...Object.keys(REC),...Object.keys(AUD)]);
+  for(const k of keys){ const a=audioFor(k); if(!a) continue;
+    out[k]={src: a.src || await blobToData(a.blob), s:a.s||0, e:a.e==null?null:a.e}; }
+  const html=SRC.replace(/\/\*REC\*\/[\s\S]*?\/\*END\*\//, ()=>'/*REC*/'+JSON.stringify(out)+'/*END*/');
+  const url=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  const aEl=document.createElement('a'); aEl.href=url; aEl.download='跟讀練習（含老師錄音）.html'; aEl.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  updateStatus('已匯出 '+Object.keys(out).length+' 句錄音');
+}
+
+/* ---------- beep ---------- */
+let actx;
+function beep(){ return new Promise(r=>{ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(), g=actx.createGain(); o.frequency.value=880; g.gain.value=.12;
+  o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+.15);
+  setTimeout(r,300); }catch(e){ r(); } }); }
+
+/* ---------- recognition + scoring ---------- */
+function align(T,H){
+  const n=T.length,m=H.length, dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
+  const same=(a,b)=>a.ch===b.ch||(a.py&&a.py===b.py);
+  for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--)
+    dp[i][j]= same(T[i].key,H[j]) ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j],dp[i][j+1]);
+  const hit=new Set(); let i=0,j=0;
+  while(i<n&&j<m){ if(same(T[i].key,H[j])){hit.add(i);i++;j++;} else if(dp[i+1][j]>=dp[i][j+1]) i++; else j++; }
+  return hit;
+}
+function paint(ln, hit, final){
+  const last=Math.max(-1,...hit);
+  ln.keys.forEach((o,k)=>{ const s=ln.spans[o.idx]; s.classList.remove('ok','miss','pend');
+    s.classList.add(hit.has(k)?'ok':(final||k<last)?'miss':'pend'); });
+}
+let rec=null;
+function listenLine(i, tok, opts={}){
+  const ln=L[S.lesson].lines[i], heardEl=ln.row.querySelector('.heard'), mic=ln.row.querySelector('[data-a=mic]');
+  return new Promise(res=>{
+    if(!SR){ res(null); return; }
+    clearMarks(ln); paint(ln,new Set(),false); heardEl.textContent='';
+    const r=new SR(); rec=r; r.lang='zh-TW'; r.interimResults=true; r.continuous=true;
+    let finalTxt='', liveTxt='', hit=new Set(), silence=null, ended=false, heardAny=false;
+    const hardMax=setTimeout(()=>r.stop(), (opts.sync?3000:5000) + ln.keys.length*650/Math.min(1,S.rate));
+    const noSpeech=setTimeout(()=>{ if(!heardAny) r.stop(); }, opts.sync?15000:7000);
+    const armSilence=()=>{ clearTimeout(silence); if(opts.ttsDone && !opts.ttsDone()) return; silence=setTimeout(()=>r.stop(),1800); };
+    r.onresult=e=>{
+      if(tok!==run){ r.abort(); return; }
+      heardAny=true; liveTxt='';
+      for(let k=e.resultIndex;k<e.results.length;k++){
+        if(e.results[k].isFinal) finalTxt+=e.results[k][0].transcript; else liveTxt+=e.results[k][0].transcript;
+      }
+      hit=align(ln.keys, keysOf(finalTxt+liveTxt)); paint(ln,hit,false);
+      heardEl.innerHTML='你說：'+finalTxt+'<span class="live">'+liveTxt+'</span>';
+      if(hit.size===ln.keys.length) setTimeout(()=>r.stop(),250); else armSilence();
+    };
+    r.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      showNotice('麥克風被拒絕了。請在網址列左邊允許麥克風；如果是直接打開檔案，請改用 Chrome 或依說明用本機伺服器開啟。'); stopAll(); } };
+    r.onend=()=>{ if(ended) return; ended=true; clearTimeout(hardMax); clearTimeout(noSpeech); clearTimeout(silence);
+      mic.classList.remove('rec'); rec=null;
+      if(tok!==run){ clearMarks(ln); res(null); return; }
+      paint(ln,hit,true);
+      const sc=ln.keys.length?Math.round(hit.size/ln.keys.length*100):0;
+      if(!heardAny) heardEl.textContent='（沒有聽到聲音）';
+      ln.row.querySelector('.txt').classList.remove('hide');
+      scores[S.lesson+'-'+i]=sc; showScore(i,sc); updateStatus(); res(sc);
+    };
+    if(opts.ttsDone) opts.recheck=armSilence;
+    try{ r.start(); mic.classList.add('rec'); }catch(e){ res(null); }
+  });
+}
+
+/* ---------- flows ---------- */
+let run=0;
+function setRunning(on){ $('go').disabled=on; $('stop').disabled=!on; }
+function stopAll(){ run++; if(synth) synth.cancel(); if(rec){ try{rec.abort();}catch(e){} }
+  if(player){ player.pause(); player.onended&&player.onended(); player=null; } if(recCtl) recCtl.abort(); setRunning(false);
+  document.querySelectorAll('.ic.rec').forEach(b=>b.classList.remove('rec')); updateStatus(); }
+function showNotice(t){ const n=$('notice'); n.textContent=t; n.style.display='block'; }
+
+async function practiceLine(i,tok){
+  if(S.sync){
+    let ttsDone=false; const opts={ttsDone:()=>ttsDone};
+    const lp=listenLine(i,tok,opts);
+    await speakLine(i,tok); ttsDone=true; opts.recheck&&opts.recheck();
+    return lp;
+  }
+  await speakLine(i,tok); if(tok!==run) return null;
+  await beep(); if(tok!==run) return null;
+  return listenLine(i,tok);
+}
+
+async function start(){
+  stopAll(); const tok=run; setRunning(true);
+  const les=L[S.lesson]; let i=S.start;
+  if(S.mode==='role' && !speakers(les).length){ setRunning(false); return; }
+  for(; i<les.lines.length; i++){
+    const ln=les.lines[i]; if(ln.note) continue;
+    if(tok!==run) return;
+    setCur(i); scrollTo(i);
+    if(S.mode==='teach'){ const ok=await recordLine(i,tok); if(!ok) { if(tok===run) stopAll(); return; } continue; }
+    if(S.mode==='listen'){ updateStatus('播放中…'); await speakLine(i,tok); await wait(350); }
+    else if(S.mode==='shadow'){
+      updateStatus('跟讀第 '+(i+1)+' 句');
+      let sc=await practiceLine(i,tok);
+      if(tok===run && sc!=null && sc<70){ updateStatus('再試一次'); await wait(600); sc=await practiceLine(i,tok); }
+      await wait(700);
+    } else {
+      if(ln.sp===S.role){ updateStatus('輪到你了！'); await beep(); if(tok!==run) return; await listenLine(i,tok); await wait(500); }
+      else { updateStatus(ln.sp+' 說…'); await speakLine(i,tok); await wait(300); }
+    }
+  }
+  if(tok===run){ setRunning(false); S.start=0; save(); updateStatus('<b>完成！</b>'); }
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- events ---------- */
+$('lesson').innerHTML=L.map((l,i)=>`<option value="${i}">${l.no}　${l.title}</option>`).join('');
+$('lesson').value=S.lesson;
+$('lesson').onchange=e=>{ stopAll(); S.lesson=+e.target.value; S.start=0; save(); render(); scrollTo(0); };
+document.querySelectorAll('#tabs button').forEach(b=>{
+  b.classList.toggle('on', b.dataset.m===S.mode);
+  b.onclick=()=>{ stopAll(); S.mode=b.dataset.m; save(); document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b)); render(); };
+});
+$('rate').value=S.rate; $('rateV').textContent=S.rate+'×';
+$('rate').oninput=e=>{ S.rate=+e.target.value; $('rateV').textContent=S.rate+'×'; save(); };
+$('voice').onchange=e=>{ S.voice=e.target.value; save(); };
+$('py').checked=S.py; $('py').onchange=e=>{ S.py=e.target.checked; save(); $('list').className=S.py?'':'py-off'; };
+$('sync').checked=S.sync; $('sync').onchange=e=>{ S.sync=e.target.checked; save(); };
+$('hide').checked=S.hide; $('hide').onchange=e=>{ S.hide=e.target.checked; save(); render(); };
+$('role').onchange=e=>{ S.role=e.target.value; save(); render(); };
+$('go').onclick=start; $('stop').onclick=stopAll;
+$('reset').onclick=()=>{ stopAll(); Object.keys(scores).forEach(k=>{ if(k.startsWith(S.lesson+'-')) delete scores[k]; }); render(); };
+$('list').onclick=async e=>{
+  const row=e.target.closest('.line'); if(!row) return;
+  const i=+row.dataset.i, a=e.target.closest('[data-a]');
+  stopAll(); setCur(i);
+  if(!a) return;
+  const tok=run; setRunning(true);
+  const act=a.dataset.a;
+  if(act==='play') await speakLine(i,tok);
+  else if(act==='rec') await recordLine(i,tok);
+  else if(act==='up'){ upTarget=i; $('upload').value=''; $('upload').click(); }
+  else if(act==='del'){ await delAudio(S.lesson+'-'+i); showRecBadge(i); updateStatus(); }
+  else { await beep(); await listenLine(i,tok); }
+  if(tok===run) setRunning(false);
+};
+$('own').checked=S.own; $('own').onchange=e=>{ S.own=e.target.checked; save(); };
+$('export').onclick=exportHtml;
+let upTarget=null;
+$('upload').onchange=async e=>{ const f=e.target.files[0]; if(!f||upTarget==null) return;
+  await putAudio(S.lesson+'-'+upTarget, {blob:f, s:0, e:null}); showRecBadge(upTarget); updateStatus(); render(); };
+document.addEventListener('keydown',e=>{
+  if(S.mode!=='teach' || /INPUT|SELECT/.test(e.target.tagName)) return;
+  if(e.code==='Space'){ e.preventDefault(); if(recCtl) recCtl.finish(); else start(); }
+  if(e.code==='Escape') stopAll();
+});
+if(!SR) showNotice('這個瀏覽器不支援語音辨識，只能使用「聆聽」。請改用 Chrome 或 Edge 開啟。');
+if(!synth) showNotice('這個瀏覽器不支援語音朗讀。請改用 Chrome、Edge 或 Safari。');
+loadAudio().then(render);
+</script>
+</body>
+</html>
