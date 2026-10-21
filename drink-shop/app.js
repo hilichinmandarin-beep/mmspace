@@ -169,7 +169,8 @@ const pages = {
     ).join("")}</div>`;
     return `
       <div class="detail" data-id="${p.id}">
-        <div class="hero">${picHTML(p)}</div>
+        <div class="hero pic">${picHTML(p)}</div>
+        <div class="detail-info">
         <div class="title-row"><h1>${t(p.name)}</h1><button class="speak-btn" data-speak="${esc(p.name)}" aria-label="發音">🔊</button></div>
         ${priceHTML(p)}
         <div class="opt"><h3>${t("甜度")}</h3>${pills("sugar")}</div>
@@ -182,6 +183,7 @@ const pages = {
           <button class="btn ghost" id="addBtn">${t("加入購物車")}</button>
           <button class="btn" id="buyBtn">${t("馬上買")}</button>
         </div>
+        </div>
       </div>`;
   },
 
@@ -192,6 +194,7 @@ const pages = {
     const ship = shipping(sub);
     return `
       <h1 class="page-title">${t("購物車")}</h1>
+      <div class="split"><div class="split-main">
       ${cart.map((it, i) => {
         const p = byId(it.id);
         return `<div class="line">
@@ -200,12 +203,13 @@ const pages = {
           <div class="qty"><button data-line="${i}" data-d="-1">−</button><b>${it.qty}</b><button data-line="${i}" data-d="1">+</button></div>
         </div>`;
       }).join("")}
-      <div class="summary">
+      </div>
+      <div class="split-side summary">
         <p><span>${t("小計")}</span><span>${money(sub)}</span></p>
         <p><span>${t("運費")}</span><span>${ship ? money(ship) : t("免運")}</span></p>
         <p class="total"><span>${t("總共")}</span><span>${money(sub + ship)}</span></p>
         <a class="btn block" href="#/checkout">${t("結帳")}</a>
-      </div>`;
+      </div></div>`;
   },
 
   // 結帳：用中文點飲料
@@ -216,25 +220,29 @@ const pages = {
     return `
       <h1 class="page-title">📝 ${t("用中文點飲料")}</h1>
       ${TEACHING.requireSentence ? `<p class="note">看圖片，用中文說出或打出你要的飲料。${SR ? "可以按 🎤 用說的。" : ""}</p>` : ""}
+      <div class="split">
+      ${TEACHING.requireSentence ? `<div class="split-main">${cart.map(practiceHTML).join("")}</div>` : ""}
+      <div class="split-side">
       <label class="namebox"><span>你的名字</span><input id="studentName" value="${esc(student)}" placeholder="例如：王小明" autocomplete="name"></label>
-      ${TEACHING.requireSentence ? cart.map(practiceHTML).join("") : ""}
       <div class="summary">
         ${cart.map((it) => `<p><span>${esc(byId(it.id).name)} ×${it.qty}</span><span>${money(linePrice(it) * it.qty)}</span></p>`).join("")}
         <p class="total"><span>${t("總共")}</span><span>${money(sub + shipping(sub))}</span></p>
         <button class="btn block" id="placeOrder">${t("送出訂單")}</button>
         <p class="note" id="orderNote"></p>
-      </div>`;
+      </div>
+      </div></div>`;
   },
 
   // 我的：名字、訂單紀錄、外觀
   me() {
     const status = (o) => o.sent === true ? `<small class="ok">✅ 已送給老師</small>`
       : o.sent === false ? `<small class="warn">⚠️ 還沒送到老師 <button class="link" data-resend="${o.id}">再送一次</button></small>` : "";
-    return `
-      <div class="profile">
+    return `<div class="me-grid">
+      <div class="me-profile profile">
         <div class="avatar">🧑‍🎓</div>
         <label class="namebox flat"><span>你的名字</span><input id="studentName" value="${esc(student)}" placeholder="例如：王小明"></label>
       </div>
+      <div class="me-orders">
       <div class="sec-head"><h2>${t("我的訂單")}</h2></div>
       ${orders.length ? `<div class="menu">${orders.map((o) => `<div class="order">
           <div><b>${esc(new Date(o.at).toLocaleString("zh-TW", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }))}</b>・${o.count} 杯
@@ -242,13 +250,16 @@ const pages = {
           <b>${money(o.total)}</b>
         </div>`).join("")}</div>`
         : `<div class="empty"><div>🧾</div>還沒有訂單</div>`}
+      </div>
+      <div class="me-look">
       <div class="sec-head"><h2>外觀</h2></div>
       <div class="swatches">
         ${THEMES.map((th) => `<button data-theme-color="${th.color}" style="--c:${th.color}" aria-label="${esc(th.name)}"><i></i>${esc(th.name)}</button>`).join("")}
       </div>
       <div class="menu">
         <a href="teacher.html"><span>👩‍🏫 老師後台</span><span>›</span></a>
-      </div>`;
+      </div>
+      </div></div>`;
   },
 };
 
