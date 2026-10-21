@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>老師後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="teacher">
+<div class="app">
+  <header class="head">
+    <div class="topbar">
+      <div class="brand"><span><span class="logo" id="shopName"></span><span class="slogan">老師後台</span></span></div>
+      <a class="more" href="index.html">← 回商店</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="info-box" id="mode"></div>
+
+    <div class="toolbar">
+      <span id="keyBox"><input type="password" id="key" placeholder="老師密碼" autocomplete="current-password"></span>
+      <button class="btn" id="refresh">重新整理</button>
+      <label><input type="checkbox" id="today" checked> 只看今天</label>
+      <label><input type="checkbox" id="auto"> 每 15 秒自動更新</label>
+    </div>
+
+    <p class="totals" id="totals"></p>
+
+    <div class="sec-head"><h2>要做的飲料</h2></div>
+    <div class="table-wrap"><table id="drinks"></table></div>
+
+    <div class="sec-head"><h2>學生</h2></div>
+    <div class="table-wrap"><table id="students"></table></div>
+
+    <div class="sec-head"><h2>全部訂單</h2></div>
+    <div class="table-wrap"><table id="orders"></table></div>
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script src="teacher.js"></script>
+</body>
+</html>
