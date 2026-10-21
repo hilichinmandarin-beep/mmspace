@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>喝吧! 飲料店</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ① 頂部：店名、送達時間、地點、購物車 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" id="shopName"></div>
+      <div class="slogan" id="shopSlogan"></div>
+    </div>
+    <button class="loc" id="loc"></button>
+    <a class="cart-btn" href="#/cart" aria-label="購物車">🛒<span class="badge" id="cartCount" hidden></span></a>
+  </header>
+
+  <!-- ② 頁面內容：依網址 #/... 切換 -->
+  <main id="view"></main>
+
+  <!-- ③ 底部導覽列 -->
+  <nav class="tabbar">
+    <a href="#/" data-tab="home"><span>🏠</span>首頁</a>
+    <a href="#/category" data-tab="category"><span>📋</span>分類</a>
+    <a href="#/deals" data-tab="deals"><span>💰</span>優惠</a>
+    <a href="#/cart" data-tab="cart"><span>🛒</span>購物車</a>
+    <a href="#/me" data-tab="me"><span>🙂</span>我</a>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
