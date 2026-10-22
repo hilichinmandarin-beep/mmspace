@@ -2,7 +2,7 @@
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-const money = (n) => SHOP.currency + n;
+const money = (n) => SHOP.currency + n.toFixed(2);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const byId = (id) => PRODUCTS.find((p) => p.id === Number(id));
 const opt = (group, name) => OPTIONS[group].find((o) => o.name === name) || OPTIONS[group][0];

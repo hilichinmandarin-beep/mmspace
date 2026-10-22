@@ -4,10 +4,10 @@ const SHOP = {
   name: "喝吧!",
   slogan: "明天送到",
   location: { code: "教室 A", label: "華語中心" },
-  currency: "$",
+  currency: "$",        // 美金；價錢都寫成美元，例如 4.5 = $4.50
   color: "#1f2fa8",      // 主題顏色（學生也可以在「我」頁面換）
-  freeShip: 100,         // 滿多少免運
-  shipFee: 20,           // 運費
+  freeShip: 15,          // 滿多少免運
+  shipFee: 2,            // 運費
 };
 
 // 學生可以選的主題顏色
@@ -48,44 +48,43 @@ const CATEGORIES = [
 const BANNERS = [
   { title: "本週特價", big: "第二杯半價", sub: "奶茶、咖啡都可以", color: "#7a4a1d", emoji: "🧋☕" },
   { title: "新品上市", big: "葡萄柚綠茶", sub: "酸酸甜甜，好喝又健康", color: "#2f7d4f", emoji: "🍊🍵" },
-  { title: "學生優惠", big: "滿 $100 免運", sub: "下課就能喝", color: "#2b3a8c", emoji: "🎒🥤" },
+  { title: "學生優惠", big: "滿 $15 免運", sub: "下課就能喝", color: "#2b3a8c", emoji: "🎒🥤" },
 ];
 
 // 圓形快捷入口（首頁廣告下方），id 對應商品的 tags
 const SHORTCUTS = [
   { id: "new",     name: "新品",     icon: "✨" },
   { id: "hot",     name: "熱銷",     icon: "🔥" },
-  { id: "sale",    name: "特價",     icon: "💰", badge: "省$10" },
-  { id: "teacher", name: "老師推薦", icon: "👩‍🏫" },
+  { id: "sale",    name: "特價",     icon: "💰", badge: "省$0.75" },
   { id: "pearl",   name: "珍珠",     icon: "⚫" },
   { id: "fruity",  name: "水果",     icon: "🍊" },
 ];
 
 // 商品
-//   price 現價、oldPrice 原價（沒有特價就不寫）、tags 對應快捷入口和首頁區塊
+//   price 現價（美金，每杯最低 $3）、oldPrice 原價（沒有特價就不寫）、tags 對應快捷入口和首頁區塊
 //   look 自動畫杯子：color 飲料顏色、top 上層顏色（拿鐵分層）、bits 配料 pearl 珍珠 / fruit 水果 / pudding 布丁 / jelly 仙草
 //   img  想用真的照片就寫 img: "images/檔名.jpg"，會取代畫出來的杯子
 const PRODUCTS = [
-  { id: 1,  name: "紅茶",         cat: "tea",     price: 30, tags: ["hot"],                          look: { color: "#a8501e" } },
-  { id: 2,  name: "綠茶",         cat: "tea",     price: 30, tags: [],                               look: { color: "#cdb64e" } },
-  { id: 3,  name: "烏龍茶",       cat: "tea",     price: 35, tags: ["teacher"],                      look: { color: "#b7782c" } },
-  { id: 4,  name: "四季春",       cat: "tea",     price: 35, tags: ["new"],                          look: { color: "#d9c25e" } },
-  { id: 5,  name: "珍珠奶茶",     cat: "milk",    price: 55, oldPrice: 65, tags: ["hot", "sale", "pearl", "teacher"], look: { color: "#c9a27e", bits: "pearl" } },
-  { id: 6,  name: "奶茶",         cat: "milk",    price: 45, tags: [],                               look: { color: "#d2b18d" } },
-  { id: 7,  name: "布丁奶茶",     cat: "milk",    price: 60, tags: ["hot"],                          look: { color: "#cfae8a", bits: "pudding" } },
-  { id: 8,  name: "仙草奶茶",     cat: "milk",    price: 55, tags: [],                               look: { color: "#c09c78", bits: "jelly" } },
-  { id: 9,  name: "珍珠鮮奶",     cat: "fresh",   price: 60, tags: ["pearl"],                        look: { color: "#f3eee4", bits: "pearl" } },
-  { id: 10, name: "紅茶拿鐵",     cat: "fresh",   price: 60, tags: ["hot"],                          look: { color: "#f0e7da", top: "#a8501e" } },
-  { id: 11, name: "黑糖珍珠鮮奶", cat: "fresh",   price: 70, oldPrice: 80, tags: ["sale", "new", "pearl"], look: { color: "#efe6d8", top: "#6b3a1c", bits: "pearl" } },
-  { id: 12, name: "抹茶拿鐵",     cat: "fresh",   price: 65, tags: [],                               look: { color: "#f0e9dc", top: "#7aa33b" } },
-  { id: 13, name: "檸檬紅茶",     cat: "fruit",   price: 45, tags: ["fruity"],                       look: { color: "#b8642a", bits: "fruit" } },
-  { id: 14, name: "百香綠茶",     cat: "fruit",   price: 50, tags: ["fruity", "teacher"],            look: { color: "#e0b43a", bits: "fruit" } },
-  { id: 15, name: "葡萄柚綠茶",   cat: "fruit",   price: 55, tags: ["fruity", "new"],                look: { color: "#e98a5e", bits: "fruit" } },
-  { id: 16, name: "多多綠茶",     cat: "fruit",   price: 50, tags: [],                               look: { color: "#e8dc9a" } },
-  { id: 17, name: "美式咖啡",     cat: "coffee",  price: 45, tags: [],                               look: { color: "#3b2416" } },
-  { id: 18, name: "拿鐵",         cat: "coffee",  price: 60, oldPrice: 70, tags: ["sale"],           look: { color: "#efe4d4", top: "#6b4428" } },
-  { id: 19, name: "冬瓜檸檬",     cat: "special", price: 45, tags: ["fruity"],                       look: { color: "#d9b56a", bits: "fruit" } },
-  { id: 20, name: "芋頭鮮奶",     cat: "special", price: 65, tags: ["new"],                          look: { color: "#c9b2da" } },
+  { id: 1,  name: "紅茶",         cat: "tea",     price: 3,                       tags: ["hot"],                     look: { color: "#a8501e" } },
+  { id: 2,  name: "綠茶",         cat: "tea",     price: 3,                       tags: [],                          look: { color: "#cdb64e" } },
+  { id: 3,  name: "烏龍茶",       cat: "tea",     price: 3.25,                    tags: [],                          look: { color: "#b7782c" } },
+  { id: 4,  name: "四季春",       cat: "tea",     price: 3.25,                    tags: ["new"],                     look: { color: "#d9c25e" } },
+  { id: 5,  name: "珍珠奶茶",     cat: "milk",    price: 4.5, oldPrice: 5.25,     tags: ["hot", "sale", "pearl"],    look: { color: "#c9a27e", bits: "pearl" } },
+  { id: 6,  name: "奶茶",         cat: "milk",    price: 3.75,                    tags: [],                          look: { color: "#d2b18d" } },
+  { id: 7,  name: "布丁奶茶",     cat: "milk",    price: 4.75,                    tags: ["hot"],                     look: { color: "#cfae8a", bits: "pudding" } },
+  { id: 8,  name: "仙草奶茶",     cat: "milk",    price: 4.5,                     tags: [],                          look: { color: "#c09c78", bits: "jelly" } },
+  { id: 9,  name: "珍珠鮮奶",     cat: "fresh",   price: 4.75,                    tags: ["pearl"],                   look: { color: "#f3eee4", bits: "pearl" } },
+  { id: 10, name: "紅茶拿鐵",     cat: "fresh",   price: 4.75,                    tags: ["hot"],                     look: { color: "#f0e7da", top: "#a8501e" } },
+  { id: 11, name: "黑糖珍珠鮮奶", cat: "fresh",   price: 5.5, oldPrice: 6.25,     tags: ["sale", "new", "pearl"],    look: { color: "#efe6d8", top: "#6b3a1c", bits: "pearl" } },
+  { id: 12, name: "抹茶拿鐵",     cat: "fresh",   price: 5,                       tags: [],                          look: { color: "#f0e9dc", top: "#7aa33b" } },
+  { id: 13, name: "檸檬紅茶",     cat: "fruit",   price: 3.75,                    tags: ["fruity"],                  look: { color: "#b8642a", bits: "fruit" } },
+  { id: 14, name: "百香綠茶",     cat: "fruit",   price: 4,                       tags: ["fruity"],                  look: { color: "#e0b43a", bits: "fruit" } },
+  { id: 15, name: "葡萄柚綠茶",   cat: "fruit",   price: 4.25,                    tags: ["fruity", "new"],           look: { color: "#e98a5e", bits: "fruit" } },
+  { id: 16, name: "多多綠茶",     cat: "fruit",   price: 4,                       tags: [],                          look: { color: "#e8dc9a" } },
+  { id: 17, name: "美式咖啡",     cat: "coffee",  price: 3.5,                     tags: [],                          look: { color: "#3b2416" } },
+  { id: 18, name: "拿鐵",         cat: "coffee",  price: 4.5, oldPrice: 5.25,     tags: ["sale"],                    look: { color: "#efe4d4", top: "#6b4428" } },
+  { id: 19, name: "冬瓜檸檬",     cat: "special", price: 3.75,                    tags: ["fruity"],                  look: { color: "#d9b56a", bits: "fruit" } },
+  { id: 20, name: "芋頭鮮奶",     cat: "special", price: 5,                       tags: ["new"],                     look: { color: "#c9b2da" } },
 ];
 
 // 首頁商品區塊：每一區顯示一個 tag 的商品
@@ -106,7 +105,7 @@ const OPTIONS = {
     { name: "去冰", pct: 0 },     { name: "熱", hot: true },
   ],
   size: [
-    { name: "中杯", add: 0, mark: "M" }, { name: "大杯", add: 10, mark: "L" },
+    { name: "中杯", add: 0, mark: "M" }, { name: "大杯", add: 1, mark: "L" },
   ],
 };
 
@@ -150,7 +149,6 @@ const WORDS = {
   "新品": ["xīnpǐn", "New"],
   "熱銷": ["rèxiāo", "Popular"],
   "特價": ["tèjià", "On sale"],
-  "老師推薦": ["lǎoshī tuījiàn", "Teacher's pick"],
   "珍珠": ["zhēnzhū", "Pearls"],
   "水果": ["shuǐguǒ", "Fruit"],
   // 商品
