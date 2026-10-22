@@ -3,7 +3,6 @@
 const SHOP = {
   name: "喝吧!",
   slogan: "SDTCML",      // 店名下方的小字
-  location: { code: "教室 A", label: "華語中心" },
   currency: "$",        // 美金；價錢都寫成美元，例如 4.5 = $4.50
   color: "#1f2fa8",      // 主題顏色（學生也可以在「我」頁面換）
   freeShip: 15,          // 滿多少免運

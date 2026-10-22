@@ -464,7 +464,6 @@ document.addEventListener("click", (e) => {
     applyTheme(c);
     return;
   }
-  if (el("#loc")) toast(`送到：${SHOP.location.label}`);
 });
 
 document.addEventListener("keydown", (e) => {
@@ -497,7 +496,6 @@ function applyLearn() {
 // ---------- 開始 ----------
 $("#shopName").textContent = SHOP.name;
 $("#shopSlogan").textContent = SHOP.slogan;
-$("#loc").innerHTML = `📍 ${esc(SHOP.location.code)}<small>${esc(SHOP.location.label)}</small>`;
 $("#tabbar").innerHTML = [["home", "#/", "🏠", "首頁"], ["category", "#/category", "📋", "分類"], ["deals", "#/deals", "💰", "優惠"], ["cart", "#/cart", "🛒", "購物車"], ["me", "#/me", "🙂", "我"]]
   .map(([tab, href, icon, label]) => `<a href="${href}" data-tab="${tab}"><span class="ic">${icon}</span>${t(label)}</a>`).join("");
 document.title = SHOP.name + " 飲料店";

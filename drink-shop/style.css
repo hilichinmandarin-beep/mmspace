@@ -38,8 +38,6 @@ button{cursor:pointer}
 .brand .mark{width:40px;height:40px;flex:none}
 .logo{display:block;font-size:1.7rem;font-weight:900;font-style:italic;color:var(--brand);line-height:1}
 .slogan{display:block;font-size:.85rem;color:var(--brand);margin-top:2px}
-.loc{border:0;background:var(--card);box-shadow:var(--shadow);border-radius:999px;padding:6px 14px;text-align:left;line-height:1.25;color:var(--brand);font-weight:700;font-size:.85rem}
-.loc small{display:block;font-weight:500;color:var(--muted)}
 .cart-btn{position:relative;width:46px;height:46px;flex:none;border-radius:50%;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;font-size:1.3rem}
 .badge[hidden]{display:none}
 .badge{position:absolute;top:-4px;right:-4px;background:var(--sale);color:#fff;font-size:.7rem;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px}
