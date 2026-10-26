@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>喝吧! 飲料店</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="head">
+    <!-- ① 頂部：Logo、購物車 -->
+    <div class="topbar">
+      <a class="brand" href="#/">
+        <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+          <rect width="40" height="40" rx="12" fill="var(--brand)"/>
+          <rect x="22" y="4" width="3.5" height="14" rx="1.75" transform="rotate(14 24 11)" fill="#fff"/>
+          <path d="M11 15 H29 L27 33 H13 Z" fill="#fff"/>
+          <rect x="9.5" y="13" width="21" height="3.5" rx="1.75" fill="#fff"/>
+          <circle cx="17" cy="29" r="1.6" fill="var(--brand)"/><circle cx="21" cy="30" r="1.6" fill="var(--brand)"/><circle cx="23.5" cy="27" r="1.6" fill="var(--brand)"/>
+        </svg>
+        <span><span class="logo" id="shopName"></span><span class="slogan" id="shopSlogan"></span></span>
+      </a>
+      <!-- ③ 導覽列：手機在底部，電腦在上方 -->
+      <nav class="tabbar" id="tabbar"></nav>
+      <a class="cart-btn" href="#/cart" aria-label="購物車">🛒<span class="badge" id="cartCount" hidden></span></a>
+    </div>
+    <!-- 學習工具：拼音、英文、點字發音 -->
+    <div class="learnbar">
+      <button data-learn="py">拼音</button>
+      <button data-learn="en">EN</button>
+      <button data-learn="speak">🔊 點字發音</button>
+    </div>
+  </header>
+
+  <!-- ② 頁面內容：依網址 #/... 切換 -->
+  <main id="view"></main>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
