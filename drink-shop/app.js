@@ -40,12 +40,12 @@ function updateBadge() {
 }
 
 let toastTimer;
-function toast(msg) {
+function toast(msg, ms = 1800) {
   const el = $("#toast");
   el.textContent = msg;
   el.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+  toastTimer = setTimeout(() => el.classList.remove("show"), ms);
 }
 
 // ---------- 造句練習 ----------
@@ -502,6 +502,6 @@ document.title = SHOP.name + " 飲料店";
 applyTheme(load("drink-theme", SHOP.color));
 applyLearn();
 updateBadge();
-if (synth) synth.getVoices();  // 先載入語音清單
+if (inAppBrowser) toast("想聽發音，請用 Safari 或 Chrome 打開這個網頁", 5000);
 window.addEventListener("hashchange", render);
 render();
