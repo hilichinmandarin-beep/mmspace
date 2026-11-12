@@ -197,7 +197,7 @@ main{padding:0 16px}
 .tabbar .t{align-items:center;text-align:center}
 .tabbar a.on{background:var(--brand-soft);color:var(--brand);font-weight:700}
 
-.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;width:max-content;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1}
 
 /* 老師後台 */

@@ -32,16 +32,44 @@ const py = (zh) => (WORDS[zh] || [zh])[0];
 const en = (zh) => (WORDS[zh] || [, zh])[1];
 
 // ---------- 發音 ----------
+// 手機要注意：iPhone 靜音鍵打開時不會發音；LINE、Facebook 等 App 裡開的網頁常常不支援發音
 const synth = window.speechSynthesis;
+const inAppBrowser = /Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(navigator.userAgent);
+let voices = [];
+function loadVoices() { voices = synth ? synth.getVoices() : []; }
+if (synth) { loadVoices(); synth.onvoiceschanged = loadVoices; }  // 手機的語音清單常常晚一點才載入
+
+function pickVoice() {
+  if (!voices.length) loadVoices();
+  const lang = (v) => v.lang.replace("_", "-").toLowerCase();
+  const want = TEACHING.voiceLang.toLowerCase();
+  return voices.find((v) => lang(v) === want) || voices.find((v) => /^(zh|cmn)/.test(lang(v))) || null;
+}
+function speakProblem(msg) {
+  if (typeof toast === "function") toast(msg, 4000);
+}
 function say(text) {
-  if (!synth) return;
-  synth.cancel();
+  if (!synth) {
+    speakProblem(inAppBrowser ? "這裡不能發音，請用 Safari 或 Chrome 打開網頁" : "這個瀏覽器不能發音，請用 Safari 或 Chrome");
+    return;
+  }
+  const v = pickVoice();
+  if (voices.length && !v) speakProblem("這台裝置沒有中文語音，請到手機設定加入中文語音");
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = TEACHING.voiceLang;
-  const voices = synth.getVoices();
-  u.voice = voices.find((v) => v.lang.replace("_", "-") === TEACHING.voiceLang) || voices.find((v) => v.lang.startsWith("zh")) || null;
+  u.lang = v ? v.lang.replace("_", "-") : TEACHING.voiceLang;
+  if (v) u.voice = v;
   u.rate = 0.85;
-  synth.speak(u);
+  u.onerror = (e) => {
+    if (e.error !== "interrupted" && e.error !== "canceled") speakProblem("發音失敗，請檢查手機音量或靜音鍵");
+  };
+  synth.resume();  // Android Chrome 有時會卡在暫停
+  // 正在唸的時候馬上 cancel 再 speak，iPhone 會把新的也吃掉，所以稍等一下
+  if (synth.speaking || synth.pending) {
+    synth.cancel();
+    setTimeout(() => synth.speak(u), 150);
+  } else {
+    synth.speak(u);
+  }
 }
 
 // ---------- 商品圖：有照片用照片，沒有就畫一杯飲料 ----------
