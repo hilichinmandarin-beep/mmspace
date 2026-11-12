@@ -45,7 +45,7 @@ const CATEGORIES = [
 
 // 輪播廣告
 const BANNERS = [
-  { title: "本週特價", big: "第二杯半價", sub: "奶茶、咖啡都可以", color: "#7a4a1d", emoji: "🧋☕" },
+  { title: "限時特價", big: "每杯省 $0.75", sub: "珍珠奶茶、黑糖珍珠鮮奶、拿鐵", color: "#7a4a1d", emoji: "🧋☕" },  // 要跟 PRODUCTS 的 oldPrice 一致
   { title: "新品上市", big: "葡萄柚綠茶", sub: "酸酸甜甜，好喝又健康", color: "#2f7d4f", emoji: "🍊🍵" },
   { title: "學生優惠", big: "滿 $15 免運", sub: "下課就能喝", color: "#2b3a8c", emoji: "🎒🥤" },
 ];

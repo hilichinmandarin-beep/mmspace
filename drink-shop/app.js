@@ -115,7 +115,7 @@ const pages = {
         ${BANNERS.map((b) => `<div class="banner" style="background:${b.color}">
           <span class="tag">${esc(b.title)}</span>
           <div class="big">${esc(b.big)}</div>
-          <div>${esc(b.sub)}</div>
+          <div class="sub">${esc(b.sub)}</div>
           <div class="emo">${b.emoji}</div>
         </div>`).join("")}
       </div>
